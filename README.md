@@ -20,3 +20,4 @@ but not attached to the core Apache Ratis repository (https://git-wip-us.apache.
 as they only need to change when one of these dependencies are changed.
 
 See also: https://github.com/apache/ratis/blob/master/BUILDING.md
+<!-- trivial change -->
