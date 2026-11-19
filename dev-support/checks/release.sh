@@ -14,12 +14,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -e -u -o pipefail
+set -u -o pipefail
 
 # This script tests the local part of the release process.  It does not publish anything.
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 cd "$DIR/../.." || exit 1
+
+BASE_DIR="$(pwd -P)"
+
+REPORT_DIR="${OUTPUT_DIR:-"${BASE_DIR}/target/release"}"
+: "${OUTPUT_LOG:="${REPORT_DIR}/output.log"}"
+
+TEMP_LOG=$(mktemp)
+trap 'rm -f "$TEMP_LOG"' EXIT
 
 : "${RATISVERSION:="0.0.1"}"
 : "${RC:="ci-test"}"
@@ -43,7 +51,15 @@ export CODESIGNINGKEY MVN_REPO_DIR RATISVERSION RC SVNDISTDIR
 
 export MAVEN_ARGS="--batch-mode"
 
-dev-support/make_rc.sh 1-prepare-src
-dev-support/make_rc.sh 2-verify-bin
-dev-support/make_rc.sh 3-publish-mvn -DaltDeploymentRepository="local::file://${STAGING_REPO_DIR}"
-dev-support/make_rc.sh 4-assembly
+( dev-support/make_rc.sh 1-prepare-src \
+    && dev-support/make_rc.sh 2-verify-bin \
+    && dev-support/make_rc.sh 3-publish-mvn -DaltDeploymentRepository="local::file://${STAGING_REPO_DIR}" \
+    && dev-support/make_rc.sh 4-assembly ) \
+  |& tee "${TEMP_LOG}"
+rc=$?
+
+mkdir -p "$REPORT_DIR"
+mv -f "$TEMP_LOG" "$OUTPUT_LOG"
+trap - EXIT
+
+exit $rc

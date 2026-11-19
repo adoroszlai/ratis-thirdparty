@@ -24,6 +24,11 @@ cd "$DIR/../.." || exit 1
 BASE_DIR="$(pwd -P)"
 : ${OUTPUT_LOG:="${BASE_DIR}/target/repro/output.log"}
 
+if [[ ! -s "${OUTPUT_LOG}" ]] || ! grep -q "investigate with diffoscope [^ ]*\.jar [^ ]*\.jar" "${OUTPUT_LOG}"; then
+  echo "No differences to investigate"
+  exit
+fi
+
 if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then
   sudo apt update -q
   sudo apt install -y diffoscope

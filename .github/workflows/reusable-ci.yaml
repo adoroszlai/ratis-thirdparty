@@ -51,6 +51,7 @@ jobs:
     with:
       script: release
       timeout-minutes: 30
+      post-failure: dev-support/checks/_diffoscope.sh
     secrets:
       DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
