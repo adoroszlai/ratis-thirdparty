@@ -133,7 +133,7 @@ mvnFun() {
 
 3-publish-mvn() {
   cd "$projectdir"
-  mvnFun verify artifact:compare deploy:deploy -DdeployAtEnd=true -DskipTests=true -Prelease -Papache-release -Dgpg.keyname="${CODESIGNINGKEY}" "$@"
+  mvnFun clean verify artifact:compare deploy:deploy -DdeployAtEnd=true -DskipTests=true -Prelease -Papache-release -Dgpg.keyname="${CODESIGNINGKEY}" "$@"
 }
 
 4-assembly() {
